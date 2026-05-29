@@ -41,7 +41,7 @@
   .meta-row{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:18px;font-size:13.5px}
   .meta-row .k{color:var(--faint);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:2px}
   .meta-row b{font-weight:600}
-  .ship .days{color:var(--blocker);font-weight:700}
+  .ship .days{color:var(--muted);font-weight:600}
 
   /* Progress */
   .progress-wrap{margin-top:22px}
@@ -108,6 +108,7 @@
   .prlog .tier-head{cursor:default}
   .prlog .tier-head:hover{background:none}
   .prlog-scroll{max-height:520px;overflow:auto;padding:2px 20px 16px}
+  section.tier.collapsed .prlog-scroll{display:none}
   .pr{display:flex;gap:12px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line-soft);font-size:13.5px}
   .pr:first-child{border-top:none}
   .pr .num{font-family:var(--mono);font-size:12px;color:var(--faint);width:44px;flex:none;text-align:right}
@@ -132,7 +133,7 @@
   <div id="app"><div class="loading">Loading roadmap…</div></div>
 </div>
 <script>
-const MD_FILE = './2026-05-28-exodus-v1-ship-roadmap.md';
+const MD_FILE = './exodus-roadmap.md';
 
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function inline(raw){
@@ -146,11 +147,11 @@ function inline(raw){
 function statusOf(c){return c==='x'?'done':c==='~'?'doing':'todo';}
 function kindOf(title){
   const t=title.toUpperCase();
-  if(t.includes('TIER A'))return'done';
-  if(t.includes('TIER B'))return'active';
-  if(t.includes('TIER C'))return'future';
-  if(t.startsWith('V2')||t.includes('DEFERRED'))return'deferred';
-  if(t.includes('BLOCKING')||t.includes('VERIFY'))return'verify';
+  if(t.includes('WORKING ON NOW'))return'active';
+  if(t.includes('UP NEXT'))return'verify';
+  if(t.includes('LATER IN THE SPRINT'))return'future';
+  if(t.includes('IDEAS FOR LATER'))return'deferred';
+  if(t==='DONE'||t.startsWith('DONE'))return'done';
   return'info';
 }
 
@@ -242,7 +243,7 @@ function render(doc){
     const isTaskSec=tasks.length>0;
     if(isTaskSec){
       const d=tasks.filter(t=>t.status==='done').length;
-      const collapsed = s.kind==='done' ? 'collapsed':''; // shipped tier collapsed by default
+      const collapsed = ''; // all sections expanded for the shared view
       html+=`<section class="tier k-${s.kind} ${collapsed}" data-sec="${si}">
         <div class="tier-head" onclick="this.parentNode.classList.toggle('collapsed')">
           <h2>${esc(s.title)}</h2>
@@ -283,8 +284,9 @@ function render(doc){
 function loadPRs(){
   fetch('./prs.json').then(r=>{if(!r.ok)throw 0;return r.json();}).then(prs=>{
     const mount=document.getElementById('prlog');if(!mount)return;
+    mount.classList.add('collapsed');
     const merged=prs.filter(p=>p.state==='MERGED').length;
-    let h=`<div class="tier-head"><h2>Shipping log</h2><span class="tier-count">${prs.length} PRs · ${merged} merged</span></div><div class="prlog-scroll">`;
+    let h=`<div class="tier-head" style="cursor:pointer" onclick="this.parentNode.classList.toggle('collapsed')"><h2>Recent changes</h2><span class="tier-count">${prs.length} updates · technical log</span><span class="tier-chev">▾</span></div><div class="prlog-scroll">`;
     prs.forEach(p=>{
       const st=(p.state||'').toLowerCase();
       const dt=(p.mergedAt||p.createdAt||'').slice(5,10);
