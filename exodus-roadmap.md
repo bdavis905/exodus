@@ -4,12 +4,6 @@
 > Last updated: 2026-05-28.
 > Status keys: `[ ]` not started · `[~] ` in progress · `[x]` done.
 
-## Overview
-
-Exodus helps you make ads — both the writing and the images — mostly by chatting
-with an AI assistant, with a dashboard to see everything it creates. Here's what's
-finished, what we're building right now, and what's coming next.
-
 ## Done
 
 - [x] Cleaned up the dashboard so everything you make shows up in one place.
