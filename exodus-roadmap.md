@@ -6,43 +6,43 @@
 
 ## Done
 
-- [x] Cleaned up the dashboard so everything you make shows up in one place.
-- [x] Removed confusing extra tabs and buttons to keep things simple.
-- [x] Made the image creator use the best model by default.
-- [x] Tidied up the screen you see when you open an image.
-- [x] Added an easy way to get back to your work from the copy editor.
-- [x] Let each customer plug in their own image-search account, so the cost is theirs, not ours.
-- [x] Fixed a setup step that was rejecting people's example ads.
-- [x] Fixed the ad-writing setup so it no longer times out on long inputs.
-- [x] Shipped a new app version so the AI assistant can find all its tools.
+- [x] Everything you create now lands in one place — the **Runs** feed.
+- [x] Removed dashboard clutter: the **Template** and **Scraper** tabs, and the **Run from References** button.
+- [x] Set the image generator to use **GPT Image** by default and dropped the extra model.
+- [x] Cleaned up the image view — removed the source blocks and the "add as scene / add as object" options, leaving the image and a download.
+- [x] Added a "Back to Runs" link in the **Copy Editor**.
+- [x] Customers can add their own **Apify** key (Settings → Pipeline Keys) for the Google image scraper, so the scraping cost is theirs, not ours.
+- [x] Fixed the **primer** setup so the command line stops rejecting people's winning ads.
+- [x] Moved the **primer** build to run in the background so it no longer times out on long inputs.
+- [x] Shipped a new **Exodus** version so the skills install correctly and Claude Code finds them.
 
 ## Working on now
 
-- [~] Teaching the setup to read messy, unlabeled ad copy and still pull out the hooks, headlines, and body on its own.
+- [~] Teaching the **primer** to read messy, unlabeled ad copy and still pull out the hooks, headlines, and body on its own.
 
 ## Up next
 
-- [ ] Make the "Create an Ad" window simpler — one clean way to do it.
-- [ ] Group every version of an ad neatly under a single card.
-- [ ] Show your saved competitor ads (your "swipe file") right inside the app.
-- [ ] Let people see and lightly edit their ad "recipe" in Settings.
-- [ ] Let people add brand details — product photos, founder, label — for the templates that need them.
-- [ ] A handful of small cleanups and tidy-ups.
+- [ ] Rework the **Run from Ad** window — one ad at a time, with **templates** folded in.
+- [ ] In **Runs**, group an ad's versions (copy-derived, reptile, template) under one card, and add a copy filter.
+- [ ] Surface the **swipe file** (your saved competitor ads) inside the **Brand Profiles** tab.
+- [ ] Let people view and edit their **primer** — their brand's winning-ad examples — in **Settings**.
+- [ ] Add a place in **Settings** for brand details (product photos, founder info, label) that the **templates** use.
+- [ ] Smaller cleanups: turn off meme generation in Claude Code for v1 (memes stay in the dashboard), retire leftover legacy pages, and add a "use as reference" action in the **Library**.
 
 ## Later in the sprint
 
-- [ ] Connect each person's Instagram so the tool can pull in post ideas.
-- [ ] Bring in winning headlines from a Facebook report.
-- [ ] Rebuild the "find real photos from Reddit, Pinterest, and Google" feature.
-- [ ] Show the behind-the-scenes steps of how an ad gets written.
-- [ ] Build out the full ad "recipe" system.
+- [ ] Let each person connect their **Instagram** so **Genesis** can pull in post ideas.
+- [ ] Pull winning **headlines** in from a **Meta** ads export.
+- [ ] Rebuild **wild-sourcing** — pulling reference photos from Reddit, Pinterest, and Google.
+- [ ] Add the **Genesis** pipeline view so you can see the steps of how an ad gets written.
+- [ ] Build the full set of **primers** — hooks, headlines, and two awareness levels of body copy — as separate, editable pieces.
 
 ## Ideas for later
 
-- [ ] Edit and remix images right inside the app.
-- [ ] A shared library of reference images everyone can pull from.
-- [ ] More ad styles — short posts, video scripts, and more.
+- [ ] Edit and remix images right in the app (e.g., "make this one Gatorade").
+- [ ] A shared **Genesis** library of reference images everyone can pull from.
+- [ ] More ad types — short-form copy, video scripts, and more.
 
 ## Getting ready to launch
 
-- [ ] Set up a separate, proper home for paying customers — its own web address and login — so their work stays separate from our testing.
+- [ ] Stand up a separate production environment for paying customers — its own domain, login, and database — kept apart from our testing.
