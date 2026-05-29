@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Exodus V1 — Ship Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4ef; --panel:#ffffff; --ink:#1d1c1a; --muted:#6c6a63; --faint:#9b988f;
+    --line:#e6e3da; --line-soft:#efece4;
+    --done:#2f7d4f; --done-bg:#e9f3ec;
+    --doing:#b9730c; --doing-bg:#fbf0df;
+    --todo:#8f8d84; --todo-bg:#f0eee8;
+    --blocker:#b3261e; --blocker-bg:#fbeae8;
+    --verify:#2563a8; --future:#7a6b9d; --deferred:#a7a49a;
+    --radius:10px;
+    --sans:'IBM Plex Sans',-apple-system,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);font-size:15px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--verify);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.85em;background:#efece3;padding:.1em .4em;border-radius:4px;color:#4a463d;word-break:break-word}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px 96px}
+
+  /* Header */
+  header{padding:40px 0 22px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:18px;font-size:13.5px}
+  .meta-row .k{color:var(--faint);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:2px}
+  .meta-row b{font-weight:600}
+  .ship .days{color:var(--blocker);font-weight:700}
+
+  /* Progress */
+  .progress-wrap{margin-top:22px}
+  .bar{height:10px;border-radius:6px;background:var(--todo-bg);overflow:hidden;display:flex;border:1px solid var(--line)}
+  .bar .seg-done{background:var(--done)}
+  .bar .seg-doing{background:var(--doing)}
+  .bar i{display:block;height:100%;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .counts{display:flex;gap:18px;margin-top:10px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+  .counts b{color:var(--ink)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .dot.done{background:var(--done)} .dot.doing{background:var(--doing)} .dot.todo{background:var(--todo)}
+
+  /* Controls */
+  .controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0;margin:8px 0 4px;border-bottom:1px solid var(--line-soft);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font:500 13px var(--sans);padding:5px 13px;border:1px solid var(--line);background:var(--panel);border-radius:20px;cursor:pointer;color:var(--muted);transition:.15s}
+  .chip:hover{border-color:var(--faint)}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .search{flex:1;min-width:180px;max-width:300px;margin-left:auto}
+  .search input{width:100%;font:400 14px var(--sans);padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+  .search input:focus{outline:none;border-color:var(--verify)}
+
+  /* Section */
+  section.tier{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:var(--radius);margin-top:18px;overflow:hidden}
+  section.tier.k-blocker{border-left-color:var(--blocker)}
+  section.tier.k-done{border-left-color:var(--done)}
+  section.tier.k-active{border-left-color:var(--doing)}
+  section.tier.k-verify{border-left-color:var(--verify)}
+  section.tier.k-future{border-left-color:var(--future)}
+  section.tier.k-deferred{border-left-color:var(--deferred)}
+  .tier-head{display:flex;align-items:baseline;gap:12px;padding:16px 20px;cursor:pointer;user-select:none}
+  .tier-head:hover{background:#fbfaf6}
+  .tier-head h2{font-size:16px;font-weight:600;margin:0;flex:1;letter-spacing:-.01em}
+  .tier-count{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+  .tier-chev{color:var(--faint);font-size:12px;transition:transform .2s}
+  section.tier.collapsed .tier-chev{transform:rotate(-90deg)}
+  section.tier.collapsed .tier-body{display:none}
+  .tier-body{padding:4px 20px 18px}
+
+  /* Tasks */
+  .task{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line-soft);align-items:flex-start}
+  .task:first-child{border-top:none}
+  .tag{flex:none;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;padding:3px 8px;border-radius:5px;margin-top:1px;width:58px;text-align:center}
+  .tag.done{background:var(--done-bg);color:var(--done)}
+  .tag.doing{background:var(--doing-bg);color:var(--doing)}
+  .tag.todo{background:var(--todo-bg);color:var(--todo)}
+  .task .txt{flex:1}
+  .task .txt strong{font-weight:600}
+  .task.done .txt{color:var(--muted)}
+  .task.done .txt strong{color:var(--ink)}
+
+  .subhead{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin:16px 0 2px}
+  .para{color:var(--muted);font-size:14px;margin:8px 0}
+  ul.bullets{margin:6px 0;padding-left:20px;color:var(--muted);font-size:14px}
+  ul.bullets li{margin:4px 0}
+
+  .note{background:#fbfaf6;border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;margin-top:18px;color:var(--muted);font-size:14px}
+  .note .para:first-child{margin-top:0}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint);font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  /* PR log */
+  .prlog{margin-top:26px}
+  .prlog .tier-head{cursor:default}
+  .prlog .tier-head:hover{background:none}
+  .prlog-scroll{max-height:520px;overflow:auto;padding:2px 20px 16px}
+  .pr{display:flex;gap:12px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line-soft);font-size:13.5px}
+  .pr:first-child{border-top:none}
+  .pr .num{font-family:var(--mono);font-size:12px;color:var(--faint);width:44px;flex:none;text-align:right}
+  .pr .st{flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;padding:2px 0;border-radius:4px;width:62px;text-align:center}
+  .pr .st.merged{background:var(--done-bg);color:var(--done)}
+  .pr .st.open{background:var(--doing-bg);color:var(--doing)}
+  .pr .st.closed{background:var(--todo-bg);color:var(--todo)}
+  .pr .date{flex:none;font-family:var(--mono);font-size:11.5px;color:var(--faint);width:48px}
+  .pr .title{flex:1;min-width:0}
+  .pr .title a{color:var(--ink)}
+  .pr .who{flex:none;font-size:11.5px;color:var(--faint);font-family:var(--mono);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @media(max-width:640px){.pr .who{display:none}}
+
+  .loading,.error{padding:60px 24px;text-align:center;color:var(--muted)}
+  .error{color:var(--blocker)}
+  .error code{display:block;margin-top:12px;background:#fff;border:1px solid var(--line);padding:10px;border-radius:6px;color:var(--ink);text-align:left;white-space:pre-wrap}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="app"><div class="loading">Loading roadmap…</div></div>
+</div>
+<script>
+const MD_FILE = './2026-05-28-exodus-v1-ship-roadmap.md';
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function inline(raw){
+  let s = esc(raw);
+  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s = s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
+  return s;
+}
+function statusOf(c){return c==='x'?'done':c==='~'?'doing':'todo';}
+function kindOf(title){
+  const t=title.toUpperCase();
+  if(t.includes('PHASE 0'))return'blocker';
+  if(t.includes('TIER A'))return'done';
+  if(t.includes('TIER B'))return'active';
+  if(t.includes('TIER C'))return'future';
+  if(t.startsWith('V2')||t.includes('DEFERRED'))return'deferred';
+  if(t.includes('BLOCKING')||t.includes('VERIFY'))return'verify';
+  return'info';
+}
+
+function parse(md){
+  const lines = md.split('\n');
+  const doc = {title:'Roadmap', meta:[], sections:[]};
+  let sec=null, curTask=null;
+  const taskRe=/^- \[([ x~])\]\s+(.*)$/;
+  function pushSection(title){sec={title, kind:kindOf(title), blocks:[]}; doc.sections.push(sec); curTask=null;}
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    if(/^# /.test(line)){doc.title=line.replace(/^#\s+/,'').trim();continue;}
+    if(/^## /.test(line)){pushSection(line.replace(/^##\s+/,'').replace(/^[^\p{L}\p{N}]+/u,'').trim());continue;}
+    if(/^---+\s*$/.test(line)){curTask=null;continue;}
+    if(!sec){ if(line.trim().startsWith('>')) doc.meta.push(line.replace(/^>\s?/,'')); continue; }
+
+    const tm=line.match(taskRe);
+    if(tm){curTask={type:'task',status:statusOf(tm[1]),raw:tm[2]};sec.blocks.push(curTask);continue;}
+    if(curTask && /^\s+\S/.test(line)){curTask.raw+=' '+line.trim();continue;}
+    curTask=null;
+    const t=line.trim();
+    if(!t)continue;
+    if(/^\*\*[^*]+\*\*:?$/.test(t)){sec.blocks.push({type:'subhead',raw:t.replace(/\*\*/g,'').replace(/:$/,'')});continue;}
+    if(/^[-*]\s+/.test(t)){sec.blocks.push({type:'bullet',raw:t.replace(/^[-*]\s+/,'')});continue;}
+    if(t.startsWith('>')){sec.blocks.push({type:'para',raw:t.replace(/^>\s?/,'')});continue;}
+    sec.blocks.push({type:'para',raw:t});
+  }
+  return doc;
+}
+
+function findDate(re){
+  const m=document.body.dataset.metatext.match(re);
+  return m?m[1]:null;
+}
+
+function render(doc){
+  const metaText = doc.meta.join(' ');
+  document.body.dataset.metatext = metaText;
+  const shipISO=(metaText.match(/Ship review[:\s]+\w+\s+(\d{4}-\d{2}-\d{2})/)||[])[1]
+              ||(metaText.match(/(\d{4}-\d{2}-\d{2})[^]*ship review/i)||[])[1];
+  const updISO=(metaText.match(/Last updated[:\s]+(\d{4}-\d{2}-\d{2})/)||[])[1];
+
+  // tallies
+  let done=0,doing=0,todo=0;
+  doc.sections.forEach(s=>s.blocks.forEach(b=>{if(b.type==='task'){if(b.status==='done')done++;else if(b.status==='doing')doing++;else todo++;}}));
+  const total=done+doing+todo||1;
+
+  let shipLine='';
+  if(shipISO){
+    const d=new Date(shipISO+'T00:00:00');
+    const days=Math.ceil((d-new Date().setHours(0,0,0,0))/864e5);
+    const fmt=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const tail = days>0?`<span class="days">${days} day${days===1?'':'s'} out</span>`:(days===0?'<span class="days">today</span>':`<span class="days">${-days}d ago</span>`);
+    shipLine=`<div class="ship"><span class="k">Ship review</span><b>${fmt}</b> &nbsp;${tail}</div>`;
+  }
+  const updLine = updISO?`<div><span class="k">Last updated</span><b>${updISO}</b></div>`:'';
+
+  let html=`<header>
+    <p class="eyebrow">Exodus V1 · Implementation Backlog</p>
+    <h1>${esc(doc.title.replace(/—.*/,'').trim()||'Ship Roadmap')}</h1>
+    <p class="sub">CLI-first · dashboard = visual layer · remove relentlessly, hide-don't-delete</p>
+    <div class="meta-row">${shipLine}${updLine}
+      <div><span class="k">Items</span><b>${done+doing+todo} tracked</b></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="bar">
+        <i class="seg-done" style="width:${done/total*100}%"></i>
+        <i class="seg-doing" style="width:${doing/total*100}%"></i>
+      </div>
+      <div class="counts">
+        <span><span class="dot done"></span><b>${done}</b> done</span>
+        <span><span class="dot doing"></span><b>${doing}</b> in progress</span>
+        <span><span class="dot todo"></span><b>${todo}</b> to do</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="chips" id="chips">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="todo">To do</button>
+      <button class="chip" data-f="doing">In progress</button>
+      <button class="chip" data-f="done">Done</button>
+    </div>
+    <div class="search"><input id="search" type="search" placeholder="Search items…" /></div>
+  </div>`;
+
+  doc.sections.forEach((s,si)=>{
+    const tasks=s.blocks.filter(b=>b.type==='task');
+    const isTaskSec=tasks.length>0;
+    if(isTaskSec){
+      const d=tasks.filter(t=>t.status==='done').length;
+      const collapsed = s.kind==='done' ? 'collapsed':''; // shipped tier collapsed by default
+      html+=`<section class="tier k-${s.kind} ${collapsed}" data-sec="${si}">
+        <div class="tier-head" onclick="this.parentNode.classList.toggle('collapsed')">
+          <h2>${esc(s.title)}</h2>
+          <span class="tier-count">${d}/${tasks.length} done</span>
+          <span class="tier-chev">▾</span>
+        </div>
+        <div class="tier-body">`;
+      s.blocks.forEach(b=>{
+        if(b.type==='task'){
+          const lab=b.status==='done'?'DONE':b.status==='doing'?'DOING':'TODO';
+          html+=`<div class="task ${b.status}" data-status="${b.status}" data-text="${esc(b.raw.replace(/[*`]/g,'').toLowerCase())}">
+            <span class="tag ${b.status}">${lab}</span><div class="txt">${inline(b.raw)}</div></div>`;
+        } else if(b.type==='subhead'){html+=`<div class="subhead">${inline(b.raw)}</div>`;}
+        else if(b.type==='bullet'){html+=`<ul class="bullets"><li>${inline(b.raw)}</li></ul>`;}
+        else{html+=`<div class="para">${inline(b.raw)}</div>`;}
+      });
+      html+=`</div></section>`;
+    } else {
+      // prose-only section (Context, Cadence, Verification, V2, Cross-owner)
+      html+=`<div class="note" data-prose="1"><div class="subhead" style="margin-top:0">${esc(s.title)}</div>`;
+      let inList=false;
+      s.blocks.forEach(b=>{
+        if(b.type==='bullet'){ if(!inList){html+='<ul class="bullets">';inList=true;} html+=`<li>${inline(b.raw)}</li>`; }
+        else { if(inList){html+='</ul>';inList=false;} if(b.type==='subhead')html+=`<div class="subhead">${inline(b.raw)}</div>`; else html+=`<div class="para">${inline(b.raw)}</div>`; }
+      });
+      if(inList)html+='</ul>';
+      html+=`</div>`;
+    }
+  });
+
+  html+=`<section class="tier prlog" id="prlog"></section>`;
+  html+=`<footer><span>Live view of 2026-05-28-exodus-v1-ship-roadmap.md + prs.json</span><span>edit the .md / refresh prs.json → reload</span></footer>`;
+  document.getElementById('app').innerHTML=html;
+  wireControls();
+  loadPRs();
+}
+
+function loadPRs(){
+  fetch('./prs.json').then(r=>{if(!r.ok)throw 0;return r.json();}).then(prs=>{
+    const mount=document.getElementById('prlog');if(!mount)return;
+    const merged=prs.filter(p=>p.state==='MERGED').length;
+    let h=`<div class="tier-head"><h2>Shipping log</h2><span class="tier-count">${prs.length} PRs · ${merged} merged</span></div><div class="prlog-scroll">`;
+    prs.forEach(p=>{
+      const st=(p.state||'').toLowerCase();
+      const dt=(p.mergedAt||p.createdAt||'').slice(5,10);
+      const who=p.author&&p.author.login?('@'+p.author.login):'';
+      h+=`<div class="pr"><span class="num">#${p.number}</span>`+
+         `<span class="st ${st}">${(p.state||'').toUpperCase()}</span>`+
+         `<span class="date">${dt}</span>`+
+         `<span class="title"><a href="${esc(p.url||'#')}" target="_blank" rel="noopener">${esc(p.title||'')}</a></span>`+
+         `<span class="who">${esc(who)}</span></div>`;
+    });
+    h+='</div>';
+    mount.innerHTML=h;
+  }).catch(()=>{const m=document.getElementById('prlog');if(m)m.remove();});
+}
+
+let curFilter='all';
+function applyFilters(){
+  const q=(document.getElementById('search').value||'').trim().toLowerCase();
+  document.querySelectorAll('.tier:not(.prlog)').forEach(sec=>{
+    let visible=0;
+    sec.querySelectorAll('.task').forEach(t=>{
+      const okF = curFilter==='all'||t.dataset.status===curFilter;
+      const okQ = !q || t.dataset.text.includes(q);
+      const show = okF&&okQ;
+      t.classList.toggle('hidden',!show);
+      if(show)visible++;
+    });
+    sec.classList.toggle('hidden',visible===0);
+  });
+  // prose notes hide while searching/filtering for focus
+  const filtering = curFilter!=='all' || q;
+  document.querySelectorAll('[data-prose]').forEach(n=>n.classList.toggle('hidden',!!filtering));
+}
+function wireControls(){
+  document.querySelectorAll('#chips .chip').forEach(c=>c.onclick=()=>{
+    document.querySelectorAll('#chips .chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');curFilter=c.dataset.f;
+    if(curFilter!=='all')document.querySelectorAll('.tier').forEach(s=>s.classList.remove('collapsed'));
+    applyFilters();
+  });
+  document.getElementById('search').oninput=applyFilters;
+}
+
+fetch(MD_FILE).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+  .then(md=>render(parse(md)))
+  .catch(e=>{
+    document.getElementById('app').innerHTML=
+      `<div class="error">Couldn't load the roadmap file.<br>(${esc(String(e.message||e))})
+       <code>cd "${'docs/superpowers/plans'}"\npython3 -m http.server 8137\n# then open http://localhost:8137/roadmap.html</code>
+       <div class="para" style="margin-top:14px">Open this page via the local server above — browsers block reading the .md from a file:// path.</div></div>`;
+  });
+</script>
+</body>
+</html>
