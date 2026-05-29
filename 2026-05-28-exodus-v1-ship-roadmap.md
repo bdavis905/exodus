@@ -7,7 +7,7 @@
 > (#117). **Primer pipeline unblocked:** #116 (CLI submission accepted) + #118 (async build
 > escapes Vercel's 300s timeout, Luke's A.28) — submit+build now work end-to-end; robust
 > parser (C2) still open. Also exodus **2026.5.2800** shipped (#119, skills as `SKILL.md`
-> dirs). Release blocker remains **Phase 0 prod separation** (needs domain + Clerk prod).
+> dirs). **Phase 0** (dev/prod separation) is underway ahead of the customer release.
 
 ## Context
 
@@ -41,13 +41,14 @@ with short verify-first spikes so we don't rebuild what exists. Key corrections:
 
 ---
 
-## ⛔ PHASE 0 — Dev/Prod separation (RELEASE BLOCKER)
+## PHASE 0 — Dev/Prod separation
 
 **Decided 2026-05-28** ([[project-dev-prod-separation-required]]): Exodus releases
-to **paying customers** ~week of 2026-06-01, so it can't ship on shared dev infra.
+to **paying customers** ~week of 2026-06-01, so it's moving onto its own production
+setup, separate from shared dev infra.
 Today everything (Vercel prod, every preview, local dev, the CLI, Trigger.dev, the
 Genesis VPS) runs on the single Convex dev deployment `dev:good-cod-360` + a single
-Clerk **dev** instance. Blockers: Clerk dev caps ~100 users / non-prod auth; one
+Clerk **dev** instance. Why: Clerk dev caps ~100 users / non-prod auth; one
 shared DB = dev work + previews read-write real customer rows with no staging.
 **Brad's calls:** custom **branded domain**; **migrate** dev data → prod.
 

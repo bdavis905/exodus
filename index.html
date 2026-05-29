@@ -146,7 +146,6 @@ function inline(raw){
 function statusOf(c){return c==='x'?'done':c==='~'?'doing':'todo';}
 function kindOf(title){
   const t=title.toUpperCase();
-  if(t.includes('PHASE 0'))return'blocker';
   if(t.includes('TIER A'))return'done';
   if(t.includes('TIER B'))return'active';
   if(t.includes('TIER C'))return'future';
@@ -212,7 +211,6 @@ function render(doc){
   let html=`<header>
     <p class="eyebrow">Exodus V1 · Implementation Backlog</p>
     <h1>${esc(doc.title.replace(/—.*/,'').trim()||'Ship Roadmap')}</h1>
-    <p class="sub">CLI-first · dashboard = visual layer · remove relentlessly, hide-don't-delete</p>
     <div class="meta-row">${shipLine}${updLine}
       <div><span class="k">Items</span><b>${done+doing+todo} tracked</b></div>
     </div>
